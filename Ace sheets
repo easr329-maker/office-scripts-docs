@@ -1,0 +1,52 @@
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
+
+# Create a new workbook
+wb = Workbook()
+ws = wb.active
+ws.title = "جدول العمل"
+
+# Data with rest days
+schedule_with_rest = [
+    ["السبت", "ضي + فرح", "آية + ايسر", "مروان + مصعب"],
+    ["الأحد", "ضي + ايسر", "آية + مروان", "فرح + مصعب"],
+    ["الاثنين", "ضي + مروان", "آية (راحة) + مصعب", "فرح + ايسر"],
+    ["الثلاثاء", "ايسر + مصعب", "فرح + مروان", "ضي + آية"],
+    ["الأربعاء", "ضي + فرح", "آية + ايسر", "فرح (راحة) + مروان"],
+    ["الخميس", "ضي + ايسر", "آية + مروان", "مصعب (راحة) + فرح"],
+    ["الجمعة", "ضي (راحة) + فرح", "آية + ايسر", "مروان + مصعب"],
+]
+
+# Headers
+headers = ["اليوم", "الصباح (06-14)", "المساء (14-22)", "الليلي (22-06)"]
+ws.append(headers)
+
+# Define colors
+shift_colors = {
+    "صباح": PatternFill(start_color="FFF9C4", end_color="FFF9C4", fill_type="solid"),
+    "مساء": PatternFill(start_color="FFCC80", end_color="FFCC80", fill_type="solid"),
+    "ليلي": PatternFill(start_color="90CAF9", end_color="90CAF9", fill_type="solid"),
+    "راحة": PatternFill(start_color="F28B82", end_color="F28B82", fill_type="solid"),  # Red for rest day
+}
+
+# Fill data and apply colors
+for row in schedule_with_rest:
+    ws.append(row)
+
+# Apply coloring
+for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=2, max_col=4):
+    for i, cell in enumerate(row):
+        value = str(cell.value)
+        if "راحة" in value:
+            cell.fill = shift_colors["راحة"]
+        elif i == 0:  # الصباح
+            cell.fill = shift_colors["صباح"]
+        elif i == 1:  # المساء
+            cell.fill = shift_colors["مساء"]
+        else:  # الليلي
+            cell.fill = shift_colors["ليلي"]
+
+# Save file
+file_path_rest = "/mnt/data/جدول_العمل_مع_الراحة.xlsx"
+wb.save(file_path_rest)
+file_path_rest
